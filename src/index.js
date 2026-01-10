@@ -14,7 +14,6 @@ const client = new Client({
 // --- Aquí creas el "mapa" de comandos ---
 client.commands = new Map();
 
-
 // --- Cargar los comandos automáticamente ---
 const commandsPath = path.join(__dirname, 'commands'); // carpeta src/commands si tus comandos están ahí
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));

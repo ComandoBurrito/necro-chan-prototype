@@ -1,5 +1,5 @@
-console.log('🚨 DEPLOY COMMANDS CORRECTO 🚨');
 require('dotenv').config();
+console.log('🚨 DEPLOY COMMANDS CORRECTO 🚨');
 const { REST, Routes } = require('discord.js');
 const fs = require('fs');
 
@@ -26,6 +26,13 @@ for (const file of commandFiles) {
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
+const CLIENT_ID = process.env.CLIENT_ID;
+const GUILD_ID = process.env.GUILD_ID;
+
+if (!CLIENT_ID || !GUILD_ID) {
+  console.error('❌ Falta CLIENT_ID o GUILD_ID en el archivo .env');
+  process.exit(1);
+}
 (async () => {
   try {
     console.log('⏳ Registrando comandos...');
@@ -40,6 +47,3 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     console.error(error);
   }
 })();
-
-
-
