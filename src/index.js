@@ -1,5 +1,7 @@
 // --- Cargar los comandos desde la carpeta src/commands ---
 require('dotenv').config();
+console.log("DEBUG - OPENAI_API_KEY:", process.env.OPENAI_API_KEY ? "✅" : "❌");
+
 const fs = require('fs');        // ya lo tienes
 const path = require('path');    // <--- ESTA LÍNEA FALTABA
 const { Client, GatewayIntentBits, Events } = require('discord.js');
