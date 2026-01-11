@@ -4,14 +4,17 @@
   "description": "A prototype Discord bot named Necro-chan.",
   "main": "src/index.js",
   "author": "Comando Burrito",
-
   "dependencies": {
     "discord.js": "^14.25.1",
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "openai": "^6.16.0"
   },
   "scripts": {
     "start": "node src/index.js",
     "deploy": "node deploy-commands.js",
     "dev": "node --watch src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
