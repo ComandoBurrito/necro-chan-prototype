@@ -1,12 +1,15 @@
+// Carga dotenv lo más arriba posible
 require('dotenv').config();
+
 const { SlashCommandBuilder } = require('discord.js');
 const OpenAI = require('openai');
 
-// Inicializar el cliente OpenAI con tu API Key
+// ✅ Inicializar OpenAI usando la API Key desde .env
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Comando /ai
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('ai')
@@ -18,6 +21,9 @@ module.exports = {
     ),
   async execute(interaction) {
     const prompt = interaction.options.getString('prompt');
+
+    // 🔹 DEBUG (opcional)
+    console.log("API Key cargada:", process.env.OPENAI_API_KEY ? "✅" : "❌");
 
     try {
       const response = await openai.chat.completions.create({
