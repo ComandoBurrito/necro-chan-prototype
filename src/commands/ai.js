@@ -1,38 +1,36 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { Configuration, OpenAIApi } = require('openai');
 require('dotenv').config();
+const { SlashCommandBuilder } = require('discord.js');
+const OpenAI = require('openai');
 
-const openai = new OpenAIApi(new Configuration({
-  apiKey: process.env.OPENAI_API_KEY
-}));
+// Inicializar el cliente OpenAI con tu API Key
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('ai')
-    .setDescription('Responde usando OpenAI')
-    .addStringOption(option => 
+    .setDescription('Genera una respuesta con OpenAI')
+    .addStringOption(option =>
       option.setName('prompt')
-        .setDescription('Escribe tu mensaje para la IA')
+        .setDescription('Texto a enviar a la IA')
         .setRequired(true)
     ),
-
   async execute(interaction) {
     const prompt = interaction.options.getString('prompt');
-    console.log(`Usuario ${interaction.user.tag} usó /ai: ${prompt}`);
 
     try {
-      const response = await openai.createChatCompletion({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }]
+      const response = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: prompt }],
       });
 
-      const reply = response.data.choices[0].message.content;
-      console.log(`Respuesta de OpenAI: ${reply}`);
+      const aiText = response.choices[0].message.content;
+      await interaction.reply(aiText);
 
-      await interaction.reply(reply);
-    } catch (err) {
-      console.error(err);
-      await interaction.reply('⚠️ Hubo un error procesando tu solicitud.');
+    } catch (error) {
+      console.error('Error OpenAI:', error);
+      await interaction.reply('❌ Ocurrió un error con OpenAI.');
     }
-  }
+  },
 };
