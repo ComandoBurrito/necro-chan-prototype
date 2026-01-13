@@ -1,19 +1,25 @@
-import axios from "axios";
+const axios = require("axios");
 
-const ollama = axios.create({
-  baseURL: process.env.OLLAMA_BASE_URL,
-  timeout: 120000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+const OLLAMA_HOST = process.env.OLLAMA_HOST || "http://localhost:11434";
+const MODEL = process.env.OLLAMA_MODEL || "necro-chan-alpha:latest";
 
-export async function generateResponse(prompt) {
-  const res = await ollama.post("/api/generate", {
-    model: process.env.OLLAMA_MODEL,
-    prompt,
-    stream: false,
-  });
+async function generateResponse(prompt) {
+  try {
+    const res = await axios.post(`${OLLAMA_HOST}/api/generate`, {
+      model: MODEL,
+      prompt,
+      stream: false,
+    });
 
-  return res.data.response;
+    if (res.data?.completion) {
+      return res.data.completion;
+    }
+
+    return "💀 No recibí respuesta del cerebro de Necro-Chan...";
+  } catch (err) {
+    console.error("Ollama request error:", err.message);
+    throw err;
+  }
 }
+
+module.exports = { generateResponse };
