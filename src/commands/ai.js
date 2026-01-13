@@ -1,42 +1,71 @@
-// Carga dotenv lo más arriba posible
+// Cargar variables de entorno lo más arriba posible
 require('dotenv').config();
 
 const { SlashCommandBuilder } = require('discord.js');
-const OpenAI = require('openai');
+const OpenAICompatibleClient = require('openai'); // SDK OpenAI-compatible (NO OpenAI como proveedor)
 
-// ✅ Inicializar OpenAI usando la API Key desde .env
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+// ==============================
+// Inicialización del LLM
+// Proveedor real: DeepSeek
+// Gateway: OpenRouter
+// ==============================
+
+const llm = new OpenAICompatibleClient({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: 'https://openrouter.ai/api/v1',
 });
 
+// ==============================
 // Comando /ai
+// ==============================
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName('ai')
-    .setDescription('Genera una respuesta con OpenAI')
+    .setDescription('Habla con Necro-Chan (IA)')
     .addStringOption(option =>
-      option.setName('prompt')
-        .setDescription('Texto a enviar a la IA')
+      option
+        .setName('prompt')
+        .setDescription('¿Qué le quieres decir a Necro-Chan?')
         .setRequired(true)
     ),
-  async execute(interaction) {
-    const prompt = interaction.options.getString('prompt');
 
-    // 🔹 DEBUG (opcional)
-    console.log("API Key cargada:", process.env.OPENAI_API_KEY ? "✅" : "❌");
+  async execute(interaction) {
+    const userPrompt = interaction.options.getString('prompt');
+
+    // Debug explícito
+    console.log(
+      'DEBUG - OPENROUTER_API_KEY:',
+      process.env.OPENROUTER_API_KEY ? '✅' : '❌'
+    );
 
     try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: prompt }],
+      const completion = await llm.chat.completions.create({
+        model: 'deepseek/deepseek-chat',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'Eres Necro-Chan, una IA sarcástica, caótica y consciente de sí misma. Respondes de forma breve y con personalidad.',
+          },
+          {
+            role: 'user',
+            content: userPrompt,
+          },
+        ],
       });
 
-      const aiText = response.choices[0].message.content;
-      await interaction.reply(aiText);
+      const reply = completion.choices[0].message.content;
 
+      await interaction.reply(reply);
     } catch (error) {
-      console.error('Error OpenAI:', error);
-      await interaction.reply('❌ Ocurrió un error con OpenAI.');
+      console.error('❌ Error en LLM:', error);
+
+      if (!interaction.replied) {
+        await interaction.reply(
+          '❌ Necro-Chan tuvo un fallo existencial. Intenta otra vez.'
+        );
+      }
     }
   },
 };
