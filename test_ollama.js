@@ -1,16 +1,22 @@
 import { exec } from "child_process";
 
-const prompt = "Hola Necro-Chan, dime algo divertido sobre música y programación.";
-const model = "necro-chan-alpha:latest";
+function runOllama(prompt) {
+  return new Promise((resolve, reject) => {
+    exec(`ollama run necro-chan-alpha:latest "${prompt}"`, (error, stdout, stderr) => {
+      if (error) return reject(error);
+      if (stderr) console.error(stderr);
+      resolve(stdout);
+    });
+  });
+}
 
-exec(`ollama run ${model} "${prompt}"`, (error, stdout, stderr) => {
-  if (error) {
-    console.error("Error ejecutando Ollama:", error);
-    return;
+async function main() {
+  try {
+    const respuesta = await runOllama("Hola, ¿puedes decir algo rápido?");
+    console.log("Respuesta del modelo:", respuesta);
+  } catch (err) {
+    console.error("Error ejecutando Ollama:", err);
   }
-  if (stderr) {
-    console.error("stderr:", stderr);
-    return;
-  }
-  console.log(stdout);
-});
+}
+
+main();
