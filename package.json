@@ -2,6 +2,7 @@
   "name": "necro-chan-prototype",
   "version": "1.0.0",
   "description": "A prototype Discord bot named Necro-chan.",
+  "type": "module",
   "main": "src/index.js",
   "author": "Comando Burrito",
   "dependencies": {
